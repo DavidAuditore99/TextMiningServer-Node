@@ -10,7 +10,7 @@ import java.util.*;
 public class App {
 
     public static void main(String[] args) throws IOException {
-        int port = 8000;
+        int port = 80;
         HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
         server.createContext("/search", new MyHandler());
         server.setExecutor(null);
