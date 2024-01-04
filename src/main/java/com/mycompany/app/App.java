@@ -50,7 +50,6 @@ public class App {
                     jsonResponse.deleteCharAt(jsonResponse.length() - 2); // Remove last comma
                 }
                 jsonResponse.append("}");
-                jsonResponse.append("}");
             
                 System.err.println(jsonResponse);
 
@@ -98,25 +97,25 @@ public class App {
     }
     private static int countTotalWords(File file) {
         int totalWords = 0;
-        try (Scanner scanner = new Scanner(file)) {
-            while (scanner.hasNextLine()) {
-                String line = scanner.nextLine();
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
                 totalWords += line.split("\\s+").length;
             }
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return totalWords;
     }
-
+    
     private static int countOccurrences(File file, String query) {
         int count = 0;
-        try (Scanner scanner = new Scanner(file)) {
-            while (scanner.hasNextLine()) {
-                String line = scanner.nextLine();
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
                 count += countMatches(line, query);
             }
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return count;
