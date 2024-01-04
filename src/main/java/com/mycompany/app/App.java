@@ -29,7 +29,8 @@ public class App {
             OperatingSystemMXBean osBean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
     
             // Obtener el uso de CPU y memoria
-            System.out.println(osBean.getCpuLoad() * 100 + "%"); // still always 0%
+            double cpuLoadPre =osBean.getCpuLoad() * 100;
+            System.out.println( cpuLoadPre+ "%"); // still always 0%
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -40,10 +41,10 @@ public class App {
             long freeMemory = osBean.getFreeMemorySize();
             long usedMemory = totalMemory - freeMemory;
             double memoryUsage = (double) usedMemory * 100 / totalMemory;
-    
+            double cpuToSend = cpuLoad > cpuLoadPre? cpuLoad : cpuLoadPre;
             // Crear la respuesta
             String response = "{"+ "\n" +
-                                "\"CPU\": " + cpuLoad + "\n" +
+                                "\"CPU\": " + cpuToSend + "\n" +
                               "\"Memoria\": " + memoryUsage + "\n" +
                               " }";
             exchange.sendResponseHeaders(200, response.length());
