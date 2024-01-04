@@ -1,3 +1,5 @@
+//Meza Benitez David Emanuel 4CM12
+
 package com.mycompany.app;
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpExchange;
@@ -6,6 +8,9 @@ import java.io.*;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.lang.management.ManagementFactory;
+import com.sun.management.OperatingSystemMXBean;
+
 
 public class App {
 
@@ -14,10 +19,40 @@ public class App {
         HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
         server.createContext("/search", new MyHandler());
         server.setExecutor(null);
+        server.createContext("/monitor", new MonitorHandler());
         server.start();
         System.out.println("Server started on port " + port);
     }
-
+    static class MonitorHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            OperatingSystemMXBean osBean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
+    
+            // Obtener el uso de CPU y memoria
+            System.out.println(osBean.getCpuLoad() * 100 + "%"); // still always 0%
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            double cpuLoad = osBean.getCpuLoad() * 100;
+            long totalMemory = osBean.getTotalMemorySize();
+            long freeMemory = osBean.getFreeMemorySize();
+            long usedMemory = totalMemory - freeMemory;
+            double memoryUsage = (double) usedMemory * 100 / totalMemory;
+    
+            // Crear la respuesta
+            String response = "{"+ "\n" +
+                                "\"CPU\": " + cpuLoad + "\n" +
+                              "\"Memoria\": " + memoryUsage + "\n" +
+                              " }";
+            exchange.sendResponseHeaders(200, response.length());
+            OutputStream os = exchange.getResponseBody();
+            os.write(response.getBytes());
+            os.close();
+        }
+    }
+    
     static class MyHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange t) throws IOException {
